@@ -69,7 +69,7 @@ const CodeSphere = () => {
 
             const theta = goldenRatio * i;
             const x = Math.cos(theta) * radius;
-            const z = Math.sin(theta) * radius;
+            // const z = Math.sin(theta) * radius;
 
             const u = (x + 1) * textureSize / 2.4;
             const v = (1 - (y + 1) / 2) * textureSize / 1.2;
