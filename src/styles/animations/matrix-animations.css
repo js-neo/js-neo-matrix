@@ -1,0 +1,59 @@
+/*src/styles/animations/matrix-animations.css*/
+
+@keyframes matrix-flicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        opacity: 1;
+    }
+    20%, 22%, 24%, 55% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes scanline {
+    0% {
+        transform: translateY(-100%);
+    }
+    100% {
+        transform: translateY(100%);
+    }
+}
+
+.matrix-flicker {
+    animation: matrix-flicker 3s infinite;
+}
+
+.scanline {
+    position: relative;
+    overflow: hidden;
+}
+
+.scanline::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: rgba(0, 255, 65, 0.5);
+    animation: scanline 5s linear infinite;
+}
+
+.code-rain {
+    background: linear-gradient(
+            to bottom,
+            transparent 0%,
+            rgba(0, 255, 65, 0.1) 2%,
+            transparent 4%
+    );
+    background-size: 100% 8px;
+    animation: rain 0.5s linear infinite;
+}
+
+@keyframes rain {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 0 8px;
+    }
+}

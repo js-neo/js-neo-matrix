@@ -1,26 +1,131 @@
+/*src/app/globals.css*/
+
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Orbitron:wght@600;700;800&display=swap');
 @import "tailwindcss";
+@config "../../tailwind.config.ts";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@layer base {
+    body {
+        @apply bg-matrix-dark text-white overflow-x-hidden;
+        font-family: 'Fira Code', monospace;
+    }
+
+    :root {
+        --color-matrix-dark: #0a0a0a;
+        --color-matrix-green: #00ff41;
+        --color-matrix-blue: #00f0ff;
+        --color-matrix-purple: #9d00ff;
+        --color-matrix-red: #ff003c;
+    }
+
+    .matrix-bg {
+        @apply absolute inset-0 -z-10;
+        background:
+                radial-gradient(circle at center, rgba(10, 10, 10, 0.8) 0%, rgba(0, 0, 0, 0.9) 70%),
+                repeating-linear-gradient(
+                        0deg,
+                        transparent,
+                        transparent 1px,
+                        rgba(0, 255, 65, 0.05) 1px,
+                        rgba(0, 255, 65, 0.05) 2px
+                );
+    }
+
+    .neon-text {
+        text-shadow:
+                0 0 5px rgba(0, 255, 65, 0.5),
+                0 0 10px rgba(0, 255, 65, 0.3),
+                0 0 15px rgba(0, 255, 65, 0.2);
+    }
+
+    .neon-border {
+        border: 1px solid var(--color-matrix-green);
+        box-shadow:
+                0 0 5px rgba(0, 255, 65, 0.5),
+                inset 0 0 5px rgba(0, 255, 65, 0.3);
+    }
+
+    .holo-border {
+        border: 1px solid var(--color-matrix-blue);
+        box-shadow:
+                0 0 10px rgba(0, 240, 255, 0.7),
+                inset 0 0 10px rgba(0, 240, 255, 0.5);
+    }
+
+    .holo-effect {
+        background: linear-gradient(
+                135deg,
+                rgba(0, 255, 65, 0.1) 0%,
+                rgba(0, 240, 255, 0.1) 50%,
+                rgba(157, 0, 255, 0.1) 100%
+        );
+        backdrop-filter: blur(5px);
+    }
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@layer utilities {
+    @keyframes glitch {
+        0% { clip-path: inset(0 0 95% 0); }
+        25% { clip-path: inset(0 0 20% 0); }
+        50% { clip-path: inset(0 0 60% 0); }
+        75% { clip-path: inset(0 0 40% 0); }
+        100% { clip-path: inset(0 0 85% 0); }
+    }
+
+    .glitch-text {
+        animation: glitch 1s infinite alternate;
+    }
+
+    .code-rain {
+        position: relative;
+        overflow: hidden;
+
+        &::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                    to bottom,
+                    transparent 0%,
+                    rgba(0, 255, 65, 0.1) 2%,
+                    transparent 4%
+            );
+            background-size: 100% 8px;
+            animation: rain 0.5s linear infinite;
+            pointer-events: none;
+            z-index: 1000;
+        }
+    }
+
+    @keyframes rain {
+        0% { background-position: 0 0; }
+        100% { background-position: 0 8px; }
+    }
+
+    .terminal-cursor {
+        animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+    }
+
+    @keyframes terminal-type {
+        0% { width: 0; }
+        100% { width: 100%; }
+    }
+
+    .terminal-line {
+        display: inline-block;
+        overflow: hidden;
+        white-space: nowrap;
+        animation: terminal-type 3s steps(40, end);
+    }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
 }

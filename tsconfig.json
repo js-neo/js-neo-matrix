@@ -1,3 +1,5 @@
+// tsconfig.json
+
 {
   "compilerOptions": {
     "target": "ES2017",
@@ -6,8 +8,9 @@
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
-    "esModuleInterop": true,
     "module": "esnext",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
