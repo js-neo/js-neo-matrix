@@ -9,13 +9,14 @@ const CodeSphere = () => {
     const mountRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (!mountRef.current) return;
+        const mountEl = mountRef.current;
+        if (!mountEl) return;
 
         const scene = new THREE.Scene();
         scene.background = null;
 
-        const width = mountRef.current.clientWidth;
-        const height = mountRef.current.clientHeight;
+        const width = mountEl.clientWidth;
+        const height = mountEl.clientHeight;
         const aspectRatio = width / height;
 
         const camera = new THREE.PerspectiveCamera(75, aspectRatio, 0.1, 1000);
@@ -29,7 +30,7 @@ const CodeSphere = () => {
         renderer.setClearColor(0x000000, 0);
         renderer.setSize(width, height);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        mountRef.current.appendChild(renderer.domElement);
+        mountEl.appendChild(renderer.domElement);
 
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
@@ -42,7 +43,6 @@ const CodeSphere = () => {
         const particlesGroup = new THREE.Group();
         particlesGroup.scale.set(0.001, 0.001, 0.001);
         scene.add(particlesGroup);
-
 
         const animation = {
             duration: 10,
@@ -152,6 +152,10 @@ const CodeSphere = () => {
         );
         scene.add(startPoint);
 
+        let animationFrameId: number;
+        let resizeTimeout: NodeJS.Timeout;
+        let animationTimeout: NodeJS.Timeout;
+
         const startAnimation = () => {
             animation.isAnimating = true;
             animation.startTime = Date.now();
@@ -162,7 +166,7 @@ const CodeSphere = () => {
         }
 
         const animate = () => {
-            requestAnimationFrame(animate);
+            animationFrameId = requestAnimationFrame(animate);
 
             const currentTime = Date.now();
 
@@ -210,27 +214,53 @@ const CodeSphere = () => {
             renderer.render(scene, camera);
         };
 
-        setTimeout(startAnimation, 3000);
+        // eslint-disable-next-line prefer-const
+        animationTimeout = setTimeout(startAnimation, 3000);
         animate();
 
         const handleResize = () => {
-            if (!mountRef.current) return;
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                if (!mountEl) return;
 
-            const newWidth = mountRef.current.clientWidth;
-            const newHeight = mountRef.current.clientHeight;
-            const newAspect = newWidth / newHeight;
+                const newWidth = mountEl.clientWidth;
+                const newHeight = mountEl.clientHeight;
+                const newAspect = newWidth / newHeight;
 
-            camera.aspect = newAspect;
-            camera.updateProjectionMatrix();
-            renderer.setSize(newWidth, newHeight);
+                camera.aspect = newAspect;
+                camera.updateProjectionMatrix();
+                renderer.setSize(newWidth, newHeight);
+            }, 100);
         };
 
         window.addEventListener('resize', handleResize);
+
         return () => {
+
             window.removeEventListener('resize', handleResize);
-            if (mountRef.current?.contains(renderer.domElement)) {
-                mountRef.current.removeChild(renderer.domElement);
+            clearTimeout(resizeTimeout);
+            clearTimeout(animationTimeout);
+            cancelAnimationFrame(animationFrameId);
+
+            if (mountEl && renderer.domElement.parentNode === mountEl) {
+                mountEl.removeChild(renderer.domElement);
             }
+
+            scene.remove(textGroup);
+            scene.remove(particlesGroup);
+            scene.remove(startPoint);
+
+            textSprites.forEach(sprite => {
+                if (sprite.material instanceof THREE.SpriteMaterial) {
+                    sprite.material.dispose();
+                    if (sprite.material.map) sprite.material.map.dispose();
+                }
+            });
+
+            particleGeometry.dispose();
+            particleMaterial.dispose();
+            renderer.dispose();
+            controls.dispose();
         };
     }, []);
 

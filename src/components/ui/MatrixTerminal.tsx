@@ -37,7 +37,7 @@ const MatrixTerminal = () => {
     useEffect(() => {
         if (!isVisible) return;
 
-        let timeouts: NodeJS.Timeout[] = [];
+        const timeouts: NodeJS.Timeout[] = [];
         let delay = 0;
 
         commands.forEach((_, index) => {

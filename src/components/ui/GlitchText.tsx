@@ -1,7 +1,7 @@
 // src/components/ui/GlitchText.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import { motion } from 'framer-motion';
 import { playGlitchSound } from './MatrixSounds';
 
@@ -25,7 +25,7 @@ const GlitchText = ({
 
     const glitchChars = '█▓▒░|╱╲╳<>';
 
-    const generateGlitch = () => {
+    const generateGlitch = useCallback(() => {
         return text
             .split('')
             .map((char) =>
@@ -34,7 +34,7 @@ const GlitchText = ({
                     : char
             )
             .join('');
-    };
+    }, [text, charGlitchProbability, glitchChars]);
 
     useEffect(() => {
         let intervalId: NodeJS.Timeout;
@@ -57,7 +57,7 @@ const GlitchText = ({
         startGlitching();
 
         return () => clearInterval(intervalId);
-    }, [text, glitchProbability, charGlitchProbability]);
+    }, [text, glitchProbability, generateGlitch]);
 
     return (
         <motion.span
