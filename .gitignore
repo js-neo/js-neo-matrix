@@ -41,5 +41,7 @@ yarn-error.log*
 next-env.d.ts
 
 /scripts
+/temp_components
+.idea
 project_contents.txt
 script_debug.log

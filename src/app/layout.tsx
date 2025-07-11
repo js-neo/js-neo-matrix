@@ -6,6 +6,7 @@ import './globals.css';
 import MatrixRain from '@/components/ui/MatrixRain';
 import EasterEggHandler from '@/components/ui/EasterEggHandler';
 import React from "react";
+import {MatrixSounds} from "@/components/ui/MatrixSounds";
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const orbitron = Orbitron({ subsets: ['latin'], variable: '--font-orbitron' });
@@ -24,9 +25,9 @@ export default function RootLayout({
     return (
         <html lang="en" className={`${inter.variable} ${orbitron.variable} ${firaCode.variable}`}>
         <body className="bg-matrix-dark text-white overflow-x-hidden">
+        <MatrixSounds />
         <MatrixRain />
         <EasterEggHandler />
-        {/*<div className="matrix-bg" />*/}
         {children}
         </body>
         </html>

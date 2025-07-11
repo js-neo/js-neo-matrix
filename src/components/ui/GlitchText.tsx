@@ -1,7 +1,9 @@
 // src/components/ui/GlitchText.tsx
-'use client'
+'use client';
+
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { playGlitchSound } from './MatrixSounds';
 
 interface GlitchTextProps {
     text: string;
@@ -42,6 +44,7 @@ const GlitchText = ({
                 if (Math.random() < glitchProbability) {
                     setIsGlitching(true);
                     setDisplayText(generateGlitch());
+                    playGlitchSound();
 
                     setTimeout(() => {
                         setIsGlitching(false);

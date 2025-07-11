@@ -3,12 +3,15 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import GlitchText from '../ui/GlitchText';
+import { MatrixTypingText } from '../ui/MatrixTypingText';
 import PillButton from '../ui/PillButton';
 import MatrixTerminal from '../ui/MatrixTerminal';
 import CodeSphere from '../ui/CodeSphere';
+import { useState } from "react";
 
 const HeroSection = () => {
+    const [titleComplete, setTitleComplete] = useState(false);
+
     return (
         <section className="min-h-[80vh] flex flex-col justify-center items-center text-center">
             <motion.div
@@ -18,11 +21,20 @@ const HeroSection = () => {
                 className="mb-12"
             >
                 <h1 className="text-5xl md:text-7xl font-orbitron font-bold mb-6 neon-text">
-                    <GlitchText text="JS-NEO" />
+                    <MatrixTypingText
+                        text="JS-NEO"
+                        speed={150}
+                        onComplete={() => setTitleComplete(true)}
+                    />
                 </h1>
-                <p className="text-xl md:text-2xl text-matrix-green max-w-3xl mx-auto">
-                    <GlitchText text="Wake up, Developer... The Matrix has you." />
-                </p>
+                {titleComplete && (
+                    <div className="text-xl md:text-2xl text-matrix-green max-w-3xl mx-auto">
+                        <MatrixTypingText
+                            text="Wake up, Developer... The Matrix has you."
+                            delay={500}
+                        />
+                    </div>
+                )}
             </motion.div>
 
             <motion.div
