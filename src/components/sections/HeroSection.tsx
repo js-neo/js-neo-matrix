@@ -10,7 +10,7 @@ import CodeSphere from '../ui/CodeSphere';
 import { useState } from "react";
 
 const HeroSection = () => {
-    const [titleComplete, setTitleComplete] = useState(false);
+    const [activeCursorId, setActiveCursorId] = useState<string>('title');
 
     return (
         <section className="min-h-[80vh] flex flex-col justify-center items-center text-center">
@@ -22,19 +22,25 @@ const HeroSection = () => {
             >
                 <h1 className="text-5xl md:text-7xl font-orbitron font-bold mb-6 neon-text">
                     <MatrixTypingText
+                        id = 'title'
                         text="JS-NEO"
                         speed={150}
-                        onComplete={() => setTitleComplete(true)}
+                        activeCursorId={activeCursorId}
+                        onComplete={() => setActiveCursorId('subtitle')}
+
                     />
                 </h1>
-                {titleComplete && (
+
                     <div className="text-xl md:text-2xl text-matrix-green max-w-3xl mx-auto">
                         <MatrixTypingText
+                            id= 'subtitle'
                             text="Wake up, Developer... The Matrix has you."
                             delay={500}
+                            activeCursorId={activeCursorId}
+                            onComplete={() => setActiveCursorId('terminal_command_1')}
                         />
                     </div>
-                )}
+
             </motion.div>
 
             <motion.div
@@ -52,7 +58,10 @@ const HeroSection = () => {
                 transition={{ delay: 0.6, duration: 0.5 }}
                 className="mb-16"
             >
-                <MatrixTerminal />
+                <MatrixTerminal
+                    activeCursorId={activeCursorId}
+                    setActiveCursorId={setActiveCursorId}
+                />
             </motion.div>
 
             <motion.div

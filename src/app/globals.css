@@ -106,7 +106,11 @@
     }
 
     .terminal-cursor {
-        animation: blink 1s infinite;
+        animation: terminal-blink 0.7s step-end infinite;
+    }
+
+    .terminal-cursor-smooth {
+        animation: terminal-blink 1s ease-in-out infinite;
     }
 
     @keyframes blink {

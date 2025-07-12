@@ -7,6 +7,7 @@ import MatrixRain from '@/components/ui/MatrixRain';
 import EasterEggHandler from '@/components/ui/EasterEggHandler';
 import React from "react";
 import {MatrixSounds} from "@/components/ui/MatrixSounds";
+import ScrollToTop from '@/components/ui/ScrollToTop';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const orbitron = Orbitron({ subsets: ['latin'], variable: '--font-orbitron' });
@@ -24,11 +25,15 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en" className={`${inter.variable} ${orbitron.variable} ${firaCode.variable}`}>
+        <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        </head>
         <body className="bg-matrix-dark text-white overflow-x-hidden">
-        <MatrixSounds />
+        <ScrollToTop/>
         <MatrixRain />
         <EasterEggHandler />
         {children}
+        <MatrixSounds />
         </body>
         </html>
     );
