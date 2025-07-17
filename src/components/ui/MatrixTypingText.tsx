@@ -3,20 +3,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-
-// Константы
-const CURSOR = {
-    BLINK_INTERVAL: 500,
-    WIDTH_RATIO: 0.6,
-    HEIGHT_RATIO: 1.0
-};
-
-const TIMING = {
-    POST_TYPING_DELAY: 1500, // пауза после окончания печати строки, когда курсор еще виден
-    POST_COMPLETE_DELAY: 500,
-    MS_PER_MINUTE: 60000,
-    DEFAULT_SPEED: 500 // символов в минуту
-};
+import {TerminalCursor} from "@/components/ui/TerminalCursor";
+import {getTypingParams, TYPING_CONFIG} from "@/constants/typingConfig";
 
 type MatrixTypingTextProps = {
     id: string;
@@ -31,7 +19,7 @@ type MatrixTypingTextProps = {
 export const MatrixTypingText = ({
                                      id,
                                      text,
-                                     speed = TIMING.DEFAULT_SPEED,
+                                     speed = TYPING_CONFIG.speed,
                                      delay = 0,
                                      className = '',
                                      activeCursorId,
@@ -39,22 +27,9 @@ export const MatrixTypingText = ({
                                  }: MatrixTypingTextProps) => {
     const [displayText, setDisplayText] = useState('');
     const [showCursor, setShowCursor] = useState(false);
+    const [isPreTyping, setIsPreTyping] = useState(true);
     const containerRef = useRef<HTMLDivElement>(null);
-
-    const getCursorStyle = () => {
-        if (!containerRef.current) return {
-            height: '1em',
-            width: '0.6em'
-        };
-
-        const fontSize = getComputedStyle(containerRef.current).fontSize;
-        return {
-            height: fontSize,
-            width: `calc(${fontSize} * ${CURSOR.WIDTH_RATIO})`
-        };
-    };
-
-    const cursorStyle = getCursorStyle();
+    const { charDelay } = getTypingParams(text.length);
 
     useEffect(() => {
         if (id !== activeCursorId) {
@@ -66,9 +41,10 @@ export const MatrixTypingText = ({
         let timeoutId: NodeJS.Timeout;
         let intervalId: NodeJS.Timeout;
         let cursorIntervalId: NodeJS.Timeout;
+        let preTypingTimeoutId: NodeJS.Timeout;
 
         const startTyping = () => {
-            const charDelay = TIMING.MS_PER_MINUTE / speed;
+            setIsPreTyping(false);
             let i = 0;
 
             intervalId = setInterval(() => {
@@ -80,7 +56,7 @@ export const MatrixTypingText = ({
                     timeoutId = setTimeout(() => {
                         setShowCursor(false);
                         onComplete?.(id);
-                    }, TIMING.POST_TYPING_DELAY);
+                    }, TYPING_CONFIG.delays.postTyping);
                 }
             }, charDelay);
         };
@@ -88,28 +64,33 @@ export const MatrixTypingText = ({
         // eslint-disable-next-line prefer-const
         cursorIntervalId = setInterval(() => {
             setShowCursor(prev => !prev);
-        }, CURSOR.BLINK_INTERVAL);
+        }, TYPING_CONFIG.cursor.blinkInterval);
 
-        const timer = setTimeout(startTyping, delay);
+        // eslint-disable-next-line prefer-const
+        preTypingTimeoutId = setTimeout(() => {
+            startTyping();
+        }, TYPING_CONFIG.delays.preTyping);
 
         return () => {
-            clearTimeout(timer);
+            clearTimeout(preTypingTimeoutId);
             clearTimeout(timeoutId);
             clearInterval(intervalId);
             clearInterval(cursorIntervalId);
         };
-    }, [text, speed, delay, onComplete, id, activeCursorId]);
+    }, [text, speed, delay, onComplete, id, activeCursorId, charDelay]);
 
     return (
-        <div className={`inline-flex items-center ${className}`} ref={containerRef}>
-            <span>{displayText}</span>
-            <span
-                className="ml-1 bg-matrix-green transition-opacity"
-                style={{
-                    ...cursorStyle,
-                    opacity: showCursor ? 1 : 0,
-                    transitionDuration: `${CURSOR.BLINK_INTERVAL / 2}ms`
-                }}
+        <div
+            className={`inline-flex items-baseline ${className}`}
+            ref={containerRef}
+            style={{ lineHeight: 1 }}
+        >
+            <span style={{ visibility: isPreTyping ? 'hidden' : 'visible' }}>
+                {displayText}
+            </span>
+            <TerminalCursor
+                show={showCursor}
+                alignWithRef={containerRef}
             />
         </div>
     );

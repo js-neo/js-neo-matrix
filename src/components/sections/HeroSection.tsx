@@ -8,6 +8,7 @@ import PillButton from '../ui/PillButton';
 import MatrixTerminal from '../ui/MatrixTerminal';
 import CodeSphere from '../ui/CodeSphere';
 import { useState } from "react";
+import {TYPING_CONFIG} from "@/constants/typingConfig";
 
 const HeroSection = () => {
     const [activeCursorId, setActiveCursorId] = useState<string>('title');
@@ -35,7 +36,7 @@ const HeroSection = () => {
                         <MatrixTypingText
                             id= 'subtitle'
                             text="Wake up, Developer... The Matrix has you."
-                            delay={500}
+                            delay={TYPING_CONFIG.speed}
                             activeCursorId={activeCursorId}
                             onComplete={() => setActiveCursorId('terminal_command_1')}
                         />

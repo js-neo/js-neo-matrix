@@ -4,15 +4,8 @@
 
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {MatrixTypingText} from './MatrixTypingText';
-
-const COMMAND_DELAY = 1500; // пауза между появлением разных команд в терминале
-const LINE_TYPING_BASE_DELAY = 1000; // Базовая задержка перед началом печати команды
-const TYPING_SPEED = 500;
-const CURSOR = {
-    BLINK_INTERVAL: 500,
-    WIDTH_RATIO: 0.6,
-    HEIGHT_RATIO: 1.0
-};
+import {TYPING_CONFIG} from "@/constants/typingConfig";
+import {TerminalCursor} from "@/components/ui/TerminalCursor";
 
 const commands = [
     {id: 'terminal_command_1', text: 'npm install @js-neo/skills'},
@@ -36,7 +29,7 @@ const MatrixTerminal = ({activeCursorId, setActiveCursorId}: MatrixTerminalProps
     useEffect(() => {
         const cursorIntervalId = setInterval(() => {
             setShowCursor(prev => !prev);
-        }, CURSOR.BLINK_INTERVAL);
+        }, TYPING_CONFIG.cursor.blinkInterval);
 
         return () => {
             clearInterval(cursorIntervalId);
@@ -60,7 +53,7 @@ const MatrixTerminal = ({activeCursorId, setActiveCursorId}: MatrixTerminalProps
         if (!isVisible) return;
 
         const timeouts: NodeJS.Timeout[] = [];
-        let delay = LINE_TYPING_BASE_DELAY;
+        let delay = TYPING_CONFIG.delays.lineStart;
 
         commands.forEach((command, index) => {
             timeouts.push(
@@ -70,13 +63,15 @@ const MatrixTerminal = ({activeCursorId, setActiveCursorId}: MatrixTerminalProps
                 }, delay)
             );
 
-            // Расчет задержки для следующей команды:
-            // Базовое время печати + фиксированная задержка между командами
-            delay += (command.text.length * (60000 / TYPING_SPEED)) + COMMAND_DELAY;
+
+            delay += TYPING_CONFIG.delays.preTyping +
+                (command.text.length * (60000 / TYPING_CONFIG.speed)) +
+                (index < commands.length - 1 ? TYPING_CONFIG.delays.postTyping : 0);
         });
 
         return () => timeouts.forEach(t => clearTimeout(t));
     }, [isVisible, setActiveCursorId]);
+
 
     const handleCommandComplete = useCallback((currentId: string) => {
         const currentIndex = commands.findIndex(cmd => cmd.id === currentId);
@@ -94,7 +89,7 @@ const MatrixTerminal = ({activeCursorId, setActiveCursorId}: MatrixTerminalProps
                     <MatrixTypingText
                         id={command.id}
                         text={command.text}
-                        speed={TYPING_SPEED}
+                        speed={TYPING_CONFIG.speed}
                         delay={0}
                         activeCursorId={activeCursorId}
                         onComplete={() => handleCommandComplete(command.id)}
@@ -104,19 +99,6 @@ const MatrixTerminal = ({activeCursorId, setActiveCursorId}: MatrixTerminalProps
         });
     }, [visibleCommands, activeCursorId, handleCommandComplete]);
 
-    const getCursorStyle = () => {
-        if (!promptRef.current) return {
-            height: '1em',
-            width: '0.6em'
-        };
-
-        const fontSize = getComputedStyle(promptRef.current).fontSize;
-        return {
-            height: fontSize,
-            width: `calc(${fontSize} * ${CURSOR.WIDTH_RATIO})`
-        };
-    };
-
     return (
         <div ref={terminalRef}
              className="terminal bg-black p-4 rounded-lg border border-matrix-green max-w-2xl mx-auto">
@@ -124,14 +106,11 @@ const MatrixTerminal = ({activeCursorId, setActiveCursorId}: MatrixTerminalProps
                 {visibleCommands.length > 0 ? (
                     commandElements ) : (
                     <div className="flex">
-                        <span ref={promptRef} className="text-matrix-purple mr-2">$</span>
-                        <span
-                            className="bg-matrix-green transition-opacity"
-                            style={{
-                                ...getCursorStyle(),
-                                opacity: showCursor ? 1 : 0,
-                                transitionDuration: `${CURSOR.BLINK_INTERVAL / 2}ms`
-                            }}
+                        <span ref={promptRef} className="text-matrix-purple mb-2 mr-2">$</span>
+                        <TerminalCursor
+                            show={showCursor}
+                            blinkInterval={TYPING_CONFIG.cursor.blinkInterval}
+                            alignWithRef={promptRef}
                         />
                     </div>)}
             </div>
